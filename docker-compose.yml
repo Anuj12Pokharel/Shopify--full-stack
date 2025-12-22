@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # Laravel Backend
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shopify_laravel_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+      - ./backend/vendor:/var/www/vendor
+    networks:
+      - shopify-network
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=shopify_app
+      - DB_USERNAME=shopify_user
+      - DB_PASSWORD=shopify_pass
+    depends_on:
+      - mysql
+
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: shopify_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - shopify-network
+    depends_on:
+      - app
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: shopify_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: shopify_app
+      MYSQL_USER: shopify_user
+      MYSQL_PASSWORD: shopify_pass
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - shopify-network
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: shopify_react_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - shopify-network
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    stdin_open: true
+    tty: true
+
+networks:
+  shopify-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
