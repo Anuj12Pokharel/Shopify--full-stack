@@ -335,7 +335,7 @@ curl "http://localhost:8000/api/products?status=active&page=1"
 curl -X POST http://localhost:8000/api/sync/products
 ```
 
-## 🔒 Security Considerations
+##  Security Considerations
 
 - ✅ HMAC verification on OAuth callback
 - ✅ Access tokens encrypted in database
@@ -344,7 +344,7 @@ curl -X POST http://localhost:8000/api/sync/products
 - ✅ Input validation and sanitization
 - ✅ SQL injection prevention via Eloquent ORM
 
-## 🚀 Deployment
+##  Deployment
 
 ### Production Checklist
 
