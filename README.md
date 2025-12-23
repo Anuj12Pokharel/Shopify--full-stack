@@ -398,7 +398,7 @@ MIT
 
 ##  Author
 
-Your Name - Technical Assignment Submission
+Anuj Pokharel 
 
 ---
 
